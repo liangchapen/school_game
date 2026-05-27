@@ -89,6 +89,12 @@ struct sceneinfo{
         shadenums++;
     }
 };
+struct animation
+{
+    int cur_stt=0;
+    std::vector<Texture> tex;
+    float timer;
+};
 // 指针浮动动画数据
 struct PointAnim
 {
@@ -106,7 +112,7 @@ GameCore     g_game;
 Player       g_player,liudoujiang;
 PointAnim g_pointAnims[10];
 // 全局资源纹理
-std::map<std::string,std::vector<Texture>>animated_items;
+std::map<std::string,animation>animated_items;
 std::map<std::string,pointer>pt;
 Texture savepointTex;
 std::map<std::string, Texture> items;

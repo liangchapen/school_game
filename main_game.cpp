@@ -24,7 +24,7 @@ int main()
     g_game.renderOffsetY = (g_game.screenH - g_game.renderViewportH) / 2;
     g_game.renderTarget = LoadRenderTexture(BASE_GAME_W, BASE_GAME_H);
     loadply();
-    const char* fontPath = "ZLabsBitmap_12px_CN.ttf";
+    const char* fontPath = "res/ZLabsBitmap_12px_CN.ttf";
     Font chFont = LoadFontEx(fontPath, 12, NULL, 50000);
     SetTargetFPS(120);
     //g_game.curScene=outdoor1;(不要管这个)
@@ -68,6 +68,7 @@ int main()
                     movply(g_player);
                     
                 }
+                draw_animated_item(8.0f,"anime",{8,8},8);
                 showply(g_player);
                 
                 tstcordbound(g_player.pos, 0.0f, (float)BASE_GAME_W, 350.0f, (float)BASE_GAME_H, playerW, playerH);

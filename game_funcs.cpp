@@ -53,8 +53,24 @@ Color chs_color_rgb(unsigned char r, unsigned char g, unsigned char b) {
   Color temp = {r, g, b};
   return temp;
 }
+void addanimation(int nums, std::string file_name) {//加载动画
+  for (int i = 1; i <= nums; i++) {
+    std::string temp;
+    if (i < 10) {
+      temp = "000";
+      temp += (char)'0' + i;
+    } else if (i >= 10) {
+      temp = "00";
+      temp += (char)'0' + i/10;
+      temp += (char)'0'+i%10;
+    }
+    std::string filedir = "res/"+file_name + '_' + temp + ".png";
+    animated_items[file_name].tex.push_back(LoadTexture(filedir.c_str()));
+  }
+}
 void loadply() // 加载
 {
+  addanimation(18, "anime");
   {
     playerTex[0] = LoadTexture("res/main_chara/main_chara_0001.png");
     playerTex[1] = LoadTexture("res/main_chara/main_chara_0002.png");
@@ -142,6 +158,7 @@ void loadply() // 加载
   items.insert(std::make_pair("sword", LoadTexture("res/items/sword.png")));
   pt["pointer"].tex = LoadTexture("res/g_u_i/pointer.png");
   pt["savepoint"].tex = LoadTexture("res/g_u_i/savepoint.png");
+
 }
 void unloadply() {
   for (int i = 0; i < 10; ++i) {
@@ -336,23 +353,20 @@ void showply(Player p) {
                        curTex.height * spriteScale};
   DrawTexturePro(curTex, srcRect, dstRect, {0, 0}, 0.0f, WHITE);
 }
-void addanimation(int nums, std::string file_name) {
-  for (int i = 1; i <= nums; i++) {
-    std::string temp;
-    if (i < 10) {
-      temp = "000";
-      temp += (char)'0' + i;
-    } else if (i > 10) {
-      temp = "00";
-      temp += (char)'0' + 1;
+void draw_animated_item(float time_period,std::string which,Vector2 pos, int scale){//绘画动画
+  float time_per_frame= time_period/animated_items[which].tex.size();
+  animated_items[which].timer+=GetFrameTime();
+  if(animated_items[which].timer>=time_per_frame){
+    animated_items[which].timer=0;
+    if(animated_items[which].cur_stt==animated_items[which].tex.size()-1){
+      animated_items[which].cur_stt=0;
+    }else{
+      animated_items[which].cur_stt++;
     }
-    std::string filedir = file_name + '_' + temp + ".png";
-    animated_items[file_name].push_back(LoadTexture(filedir.c_str()));
   }
+  DrawTextureEx(animated_items[which].tex[animated_items[which].cur_stt], pos, 0, scale, WHITE);
 }
-
-void tstcordbound(Vector2 &pos, float xb1, float xb2, float yb1, float yb2,
-                  float wid, float hi) // 设置边界
+void tstcordbound(Vector2 &pos, float xb1, float xb2, float yb1, float yb2, float wid, float hi) // 设置边界
 {
   if (pos.x <= xb1)
     pos.x = xb1;
@@ -364,8 +378,7 @@ void tstcordbound(Vector2 &pos, float xb1, float xb2, float yb1, float yb2,
     pos.y = yb2 - hi;
 }
 
-void tstcordobj(Vector2 &pos, float xb1, float xb2, float yb1, float yb2,
-                float wid, float hi) // 设置物品碰撞
+void tstcordobj(Vector2 &pos, float xb1, float xb2, float yb1, float yb2, float wid, float hi) // 设置物品碰撞
 {
   float feetHeight = 8.0f;
   float playerFeetTop = pos.y + hi - feetHeight;
@@ -393,10 +406,10 @@ void tstcordobj(Vector2 &pos, float xb1, float xb2, float yb1, float yb2,
 void drawbg(Texture bg, int w, int h) // 图画背景
 {
   DrawTexturePro(bg, {0.0f, 0.0f, (float)bg.width, (float)bg.height},
-                 {0.0f, 0.0f, (float)w, (float)h}, {0, 0}, 0.0f, WHITE);
+    {0.0f, 0.0f, (float)w, (float)h}, {0, 0}, 0.0f, WHITE);
 }
 
-void drawani(PointAnim &anim, Vector2 target, std::string which) // 添加指针
+void drawani(PointAnim &anim, Vector2 target, std::string which) // 绘画指针
 {
   if (anim.targetPos.x != target.x || anim.targetPos.y != target.y) {
     anim.targetPos = target;
@@ -470,8 +483,6 @@ void readwhere() {
     g_player.pos = {18.0f, 532.0f};
     g_game.curScene = welcome_scene;
   }
-
-  file.close(); // 可选，析构时会自动调用，但显式写出来更清晰
 }
 void writewhere(int where, Vector2 pos) {
   std::ofstream file("res/where.txt");
@@ -483,4 +494,4 @@ void writewhere(int where, Vector2 pos) {
   file << " " << pos.x << " " << pos.y;
 }
 void savept(Vector2 pos) { writewhere(g_game.curScene, g_player.pos); }
-// 这神了
+// 这期神了
