@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <raylib.h>
+#include <string>
 #include <utility>
 #include <vector>
 Color chs_color_str(std::string str) { // 将string转换为颜色
@@ -155,7 +156,7 @@ void loadply() // 加载
                          {174, 544});
   } // scene outdoor1
   savepointTex = LoadTexture("res/g_u_i/savepoint.png");
-  items.insert(std::make_pair("sword", LoadTexture("res/items/sword.png")));
+  items.insert(std::make_pair("sg_game.word", LoadTexture("res/items/sg_game.word.png")));
   pt["pointer"].tex = LoadTexture("res/g_u_i/pointer.png");
   pt["savepoint"].tex = LoadTexture("res/g_u_i/savepoint.png");
 
@@ -180,27 +181,19 @@ void unloadply() {
 
   UnloadTexture(savepointTex);
 
-  auto swordIt = items.find("sword");
-  if (swordIt != items.end()) {
-    UnloadTexture(swordIt->second);
-  }
-  items.clear();
-
-  auto pointerIt = pt.find("pointer");
-  if (pointerIt != pt.end()) {
-    UnloadTexture(pointerIt->second.tex);
-  }
   pt.clear();
 }
+
 void playdia(std::vector<dia> dial, Font font, int where) { // 显示对话
+  g_game.diatimer+=GetFrameTime();
   Color opa = {0, 0, 0, 200};
   if (g_game.dialpt[where] < dial.size()) {
     g_game.indial = false;
     std::string temp = dial[g_game.dialpt[where]].txt;
     std::vector<std::string> show;
-    while (temp.length() > 50) {
-      std::string cmp = temp.substr(0, 50); // 每行50字
-      temp = temp.substr(50);               // 从第50字开始
+    while (temp.length() > 60) {
+      std::string cmp = temp.substr(0, 60); // 每行50字
+      temp = temp.substr(60);              // 从第50字开始
       show.push_back(cmp);
     }
     if (!temp.empty()) {
@@ -216,14 +209,33 @@ void playdia(std::vector<dia> dial, Font font, int where) { // 显示对话
     }
     float startY = (float)2 * BASE_GAME_H / 3 + 20 + 48;
     float lineHeight = dial[g_game.dialpt[where]].size + 5;
-
-    for (int i = 0; i < show.size(); i++) {
+    if (g_game.which < show.size() && g_game.word < show[g_game.which].size() && g_game.diatimer > dial[g_game.dialpt[where]].timeper) {
+      g_game.word += 3;
+      g_game.diatimer = 0;
+    }
+    if (g_game.which < show.size() && g_game.word >= show[g_game.which].size()) {
+      g_game.which++;
+      g_game.word = 0;
+    }
+    for (int i = 0; i <= g_game.which - 1; i++) {
       DrawTextEx(font, show[i].c_str(), {20, startY + i * lineHeight},
+                  dial[g_game.dialpt[where]].size, 1,
+                  dial[g_game.dialpt[where]].colour);
+    }
+    
+    if (g_game.which < show.size()) {
+      std::string k = show[g_game.which].substr(0, g_game.word);
+      
+      DrawTextEx(font, k.c_str(), {20, startY + g_game.which * lineHeight},
                  dial[g_game.dialpt[where]].size, 1,
                  dial[g_game.dialpt[where]].colour);
     }
+    
     if (IsKeyPressed(KEY_Q)) {
       g_game.dialpt[where]++;
+      g_game.diatimer = 0;
+      g_game.which = 0;
+      g_game.word = 0;
     }
   } else {
     g_game.indial = true;
@@ -231,6 +243,8 @@ void playdia(std::vector<dia> dial, Font font, int where) { // 显示对话
   if (g_game.dialbl[where] && g_game.dialpt[where] >= dial.size()) {
     g_game.dialpt[where] = 0;
     g_game.indial = false;
+    g_game.which = 0;
+    g_game.word = 0;
   }
 }
 void refresh() { // 重置
@@ -436,16 +450,19 @@ void loadtxt(std::string path, sceneinfo &scn) { // 加载文本
   std::string clr;
   std::string who = "";
   std::string str;
+  float timeperi;
   int sz;
   while (1) {
     file >> num;
     if (num == 114514) {
       break;
     }
-    file >> who >> clr >> str >> sz;
+    file >> who >> clr >> sz >> timeperi;
     if (who != lstwho)
       unum++;
-    dia temp = {who, str, chs_color_str(clr), sz};
+    std::getline(file, str);
+    std::getline(file, str);
+    dia temp = {who, str, chs_color_str(clr), sz,timeperi};
     scn.dialg[unum].push_back(temp);
     lstwho = who;
   }

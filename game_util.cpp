@@ -17,6 +17,7 @@ struct dia
     std::string txt;
     Color colour;
     int size;
+    float timeper;
 };
 // 玩家结构体 收纳所有玩家相关数据
 struct Player
@@ -49,6 +50,9 @@ struct GameCore
     int screenW;
     int screenH;
     bool indial;
+    float diatimer;
+    int which=0;
+    int word=0;
     int dialpt[30];//存储对话位置
     int dialbl[30];//对话是否显示
     float renderScale;

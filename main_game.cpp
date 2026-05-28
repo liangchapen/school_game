@@ -47,7 +47,7 @@ int main()
                 //DrawRectangle(g_player.pos.x, g_player.pos.y, playerW, playerH, GREEN);
                 DrawText(TextFormat("x: %d, y: %d", (int)g_player.pos.x, (int)g_player.pos.y), 0, 0, 30, BLUE);
                 
-                if(IsKeyPressed(KEY_P)){
+                if(IsKeyPressed(KEY_Q)){
                     g_game.dialbl[2]=false;
                 }
                 playdia(sceneTex[g_game.curScene].dialg[1],chFont,1);
