@@ -146,6 +146,7 @@ void loadply() // 加载
     sceneTex[2].addshade(LoadTexture("res/shade/classs_0004.png"), {1626, 650},
                          {1574, 558});
   } // 添加场景
+  sounds["save"]=LoadSound("res/sounds/save.wav");
   {
     sceneTex[3].tex = LoadTexture("res/scene/outdoor1.png");
     sceneTex[3].addshade(LoadTexture("res/shade/outdoorchair.png"), {344, 810},
@@ -512,3 +513,49 @@ void writewhere(int where, Vector2 pos) {
 }
 void savept(Vector2 pos) { writewhere(g_game.curScene, g_player.pos); }
 // 这期神了
+void show_item_to(std::string txt,std::string use,Font font)
+{
+  static bool show=false;
+  Color opa = {0, 0, 0, 200};
+  float startY = (float)2 * BASE_GAME_H / 3 + 20 + 48;
+  if(use=="save"){
+    if(IsKeyPressed(KEY_E)&&!show){
+      show=true;
+    }
+    if(IsKeyPressed(KEY_Y)){
+      savept(g_player.pos);
+      PlaySound(sounds["save"]);
+      show=false;
+    }
+    if(IsKeyPressed(KEY_N)){
+      show=false;
+      
+    }
+    if(show){
+      DrawRectangle(0, 2 * (BASE_GAME_H / 3), BASE_GAME_W, BASE_GAME_H / 3, opa);
+      DrawTextEx(font, txt.c_str(), {20,startY}, 48,9, WHITE);
+    }
+  }
+}
+bool add_item(Vector2 &pos, float xb1, float xb2, float yb1, float yb2, float wid, float hi)
+{
+    float feetHeight = 8.0f;
+  float playerFeetTop = pos.y + hi - feetHeight;
+  float playerFeetBottom = pos.y + hi;
+
+  float overlapX = (pos.x + wid > xb1 && pos.x < xb2)
+                       ? fminf(pos.x + wid - xb1, xb2 - pos.x)
+                       : 0.0f;
+  float overlapY = (playerFeetBottom > yb1 && playerFeetTop < yb2)
+                       ? fminf(playerFeetBottom - yb1, yb2 - playerFeetTop)
+                       : 0.0f;
+
+  if (overlapX <= 0.0f || overlapY <= 0.0f)
+    return false;
+
+  if (overlapX < overlapY) {
+    return true;
+  } else {
+    return true;
+  }
+}

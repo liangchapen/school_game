@@ -6,6 +6,7 @@ int main()
     int num;
     // 初始化全局游戏数据
     g_game.Init();
+    InitAudioDevice();
     g_player.Init();
     memset(g_game.dialpt,0,sizeof(g_game.dialpt));
     memset(g_game.dialpt,false,sizeof(g_game.dialpt));
@@ -21,6 +22,7 @@ int main()
     g_game.renderViewportW = (int)(BASE_GAME_W * screenScale);
     g_game.renderViewportH = (int)(BASE_GAME_H * screenScale);
     g_game.renderOffsetX = (g_game.screenW - g_game.renderViewportW) / 2;
+    
     g_game.renderOffsetY = (g_game.screenH - g_game.renderViewportH) / 2;
     g_game.renderTarget = LoadRenderTexture(BASE_GAME_W, BASE_GAME_H);
     loadply();
@@ -70,7 +72,9 @@ int main()
                 }
                 draw_animated_item(8.0f,"anime",{8,8},8);
                 showply(g_player);
-                
+                if(add_item(g_player.pos, 613, 666, 605, 648,playerW, playerH)){
+                    show_item_to("yes","save",chFont);
+                }
                 tstcordbound(g_player.pos, 0.0f, (float)BASE_GAME_W, 350.0f, (float)BASE_GAME_H, playerW, playerH);
                 break;
             }

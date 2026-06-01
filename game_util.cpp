@@ -125,7 +125,4 @@ Texture playerTex[10];
 Texture friendliu[10];
 static const int BASE_GAME_W = 1920;
 static const int BASE_GAME_H = 1200;
-void cnt(){
-    static int num;
-    num++;
-}
+std::map<std::string, Sound>sounds;
